@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rhaisy’s Calculator</title>
+    <style>
+        /* --- CSS VARIABLES & RESET --- */
+        :root {
+            /* Palet Warna Jerman (Modern & Soft) */
+            --bg-color: #121212;
+            --calc-bg: #1e1e1e;
+            
+            /* Warna Aksen */
+            --german-red: #DD0000;
+            --german-gold: #FFCE00;
+            --german-black: #000000;
+            
+            /* Warna Tombol */
+            --btn-num-bg: #2d2d2d;
+            --btn-num-hover: #3d3d3d;
+            --btn-op-bg: #3a3a3a; 
+            --btn-eq-bg: var(--german-red);
+            --btn-del-bg: #555555;
+            
+            /* Ukuran & Bentuk */
+            --radius-outer: 25px;
+            --radius-btn: 50px; 
+            --shadow-soft: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: #ffffff; /* Global text color white */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* --- DECORATIVE HEADER --- */
+        .app-header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .app-header h1 {
+            font-size: 2rem;
+            font-weight: 700; /* Bold */
+            letter-spacing: 2px;
+            margin-bottom: 5px;
+            color: #ffffff; /* Putih Saja */
+            text-transform: uppercase;
+        }
+
+        .app-header p {
+            color: #ffffff;
+            font-size: 0.95rem;
+            font-weight: 600; /* Bold */
+            opacity: 0.7;
+        }
+
+        /* --- CALCULATOR BODY --- */
+        .calculator {
+            background-color: var(--calc-bg);
+            border-radius: var(--radius-outer);
+            box-shadow: var(--shadow-soft);
+            width: 100%;
+            max-width: 360px;
+            padding: 25px;
+            border-top: 4px solid var(--german-gold); /* Aksen emas di atas */
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Dekorasi garis bendera halus di background */
+        .calculator::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 6px;
+            background: linear-gradient(to right, 
+                var(--german-black) 33%, 
+                var(--german-red) 33%, var(--german-red) 66%, 
+                var(--german-gold) 66%);
+            opacity: 0.8;
+        }
+
+        /* --- DISPLAY SCREEN --- */
+        .screen {
+            background-color: #000;
+            border-radius: 15px;
+            padding: 20px;
+            text-align: right;
+            margin-bottom: 25px;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.5);
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            height: 100px;
+        }
+
+        .previous-operand {
+            color: #ffffff; /* Putih Saja (sebelumnya emas) */
+            font-size: 1.1rem;
+            min-height: 1.5rem;
+            margin-bottom: 5px;
+            font-weight: 600; /* Bold */
+            opacity: 0.6; /* Sedikit transparan agar terlihat secondary */
+        }
+
+        .current-operand {
+            color: #ffffff; /* Putih Saja */
+            font-size: 2.8rem;
+            font-weight: 700; /* Extra Bold */
+            word-wrap: break-word;
+            word-break: break-all;
+        }
+
+        /* --- KEYPAD --- */
+        .keypad {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+        }
+
+        button {
+            height: 60px;
+            width: 60px;
+            border-radius: var(--radius-btn);
+            border: none;
+            font-size: 1.4rem;
+            font-weight: 700; /* Font tombol lebih bold */
+            cursor: pointer;
+            transition: all 0.15s ease;
+            outline: none;
+            user-select: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
+            color: #ffffff; /* Semua tombol putih */
+        }
+
+        button:active {
+            transform: scale(0.92);
+        }
+
+        /* Style Tombol Angka */
+        .btn-num {
+            background-color: var(--btn-num-bg);
+        }
+        .btn-num:hover {
+            background-color: var(--btn-num-hover);
+        }
+
+        /* Style Tombol Operator */
+        .btn-op {
+            background-color: var(--btn-op-bg);
+        }
+        .btn-op:hover {
+            background-color: #444;
+        }
+
+        /* Style Tombol Sama Dengan (Merah) */
+        .btn-eq {
+            background-color: var(--german-red);
+            grid-column: span 1;
+            width: 100%;
+            border-radius: 30px; 
+            font-weight: 800; /* Paling bold */
+        }
+        .btn-eq:hover {
+            background-color: #ff1a1a;
+        }
+
+        /* Style Tombol Hapus (AC & DEL) */
+        .btn-del {
+            background-color: var(--btn-del-bg);
+            font-size: 1.1rem;
+        }
+        .btn-del:hover {
+            background-color: #666;
+        }
+
+        /* --- HISTORY SECTION --- */
+        .history-section {
+            margin-top: 30px;
+            width: 100%;
+            max-width: 360px;
+            text-align: left;
+        }
+
+        .history-title {
+            font-size: 0.95rem;
+            color: #ffffff; /* Judul putih */
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 700; /* Bold */
+            border-bottom: 1px solid #333;
+            padding-bottom: 5px;
+        }
+
+        .history-list {
+            list-style: none;
+            max-height: 200px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: #555 #222;
+        }
+        
+        .history-list::-webkit-scrollbar {
+            width: 6px;
+        }
+        .history-list::-webkit-scrollbar-thumb {
+            background-color: #555;
+            border-radius: 3px;
+        }
+
+        .history-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #2a2a2a;
+            color: #ffffff; /* Riwayat Putih */
+            font-size: 0.9rem;
+            font-weight: 500; /* Medium bold */
+            display: flex;
+            justify-content: space-between;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .history-item span.result {
+            color: #ffffff; /* Hasil Putih */
+            font-weight: 700; /* Bold */
+            margin-left: 10px;
+        }
+
+        .empty-history {
+            color: #ffffff;
+            opacity: 0.4;
+            font-style: italic;
+            font-size: 0.85rem;
+            text-align: center;
+            padding: 10px 0;
+            font-weight: 500;
+        }
+
+        /* Animasi */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Responsif */
+        @media (max-width: 380px) {
+            .calculator { padding: 20px; }
+            button { height: 50px; width: 50px; font-size: 1.2rem; }
+            .current-operand { font-size: 2.2rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="app-header">
+        <h1>Rhaisy’s Calculator</h1>
+        <p>Muhammad Rizky Nizam</p>
+    </header>
+
+    <main class="calculator">
+        <!-- Layar Tampilan -->
+        <div class="screen">
+            <div class="previous-operand" data-previous></div>
+            <div class="current-operand" data-current>0</div>
+        </div>
+
+        <!-- Tombol Kalkulator -->
+        <div class="keypad">
+            <!-- Baris 1 -->
+            <button class="btn-del" data-action="clear">C</button>
+            <button class="btn-del" data-action="delete">⌫</button>
+            <button class="btn-op" data-operation>÷</button>
+            <button class="btn-op" data-operation>×</button>
+
+            <!-- Baris 2 -->
+            <button class="btn-num" data-number>7</button>
+            <button class="btn-num" data-number>8</button>
+            <button class="btn-num" data-number>9</button>
+            <button class="btn-op" data-operation>-</button>
+
+            <!-- Baris 3 -->
+            <button class="btn-num" data-number>4</button>
+            <button class="btn-num" data-number>5</button>
+            <button class="btn-num" data-number>6</button>
+            <button class="btn-op" data-operation>+</button>
+
+            <!-- Baris 4 -->
+            <button class="btn-num" data-number>1</button>
+            <button class="btn-num" data-number>2</button>
+            <button class="btn-num" data-number>3</button>
+            <!-- Equals takes up one spot, but we span it vertically -->
+            <button class="btn-eq" style="grid-row: span 2; height: 100%; border-radius: 30px;" data-equals>=</button>
+
+            <!-- Baris 5 -->
+            <button class="btn-num" data-number>.</button>
+            <button class="btn-num" data-number>0</button>
+        </div>
+    </main>
+
+    <!-- Riwayat Perhitungan -->
+    <section class="history-section">
+        <div class="history-title">Riwayat</div>
+        <ul class="history-list" id="historyList">
+            <li class="empty-history">Belum ada perhitungan</li>
+        </ul>
+    </section>
+
+    <script>
+        /**
+         * LOGIKA KALKULATOR
+         */
+        class Calculator {
+            constructor(previousOperandTextElement, currentOperandTextElement) {
+                this.previousOperandTextElement = previousOperandTextElement;
+                this.currentOperandTextElement = currentOperandTextElement;
+                this.clear();
+            }
+
+            clear() {
+                this.currentOperand = '0';
+                this.previousOperand = '';
+                this.operation = undefined;
+                this.resetDisplay = false;
+            }
+
+            delete() {
+                if (this.resetDisplay) {
+                    this.clear();
+                    return;
+                }
+                if (this.currentOperand === '0') return;
+                
+                this.currentOperand = this.currentOperand.toString().slice(0, -1);
+                if (this.currentOperand === '') {
+                    this.currentOperand = '0';
+                }
+            }
+
+            appendNumber(number) {
+                if (this.resetDisplay) {
+                    this.currentOperand = '';
+                    this.resetDisplay = false;
+                }
+                if (number === '.' && this.currentOperand.includes('.')) return;
+                if (this.currentOperand === '0' && number !== '.') {
+                    this.currentOperand = number.toString();
+                } else {
+                    this.currentOperand = this.currentOperand.toString() + number.toString();
+                }
+            }
+
+            chooseOperation(operation) {
+                if (this.currentOperand === '') return;
+                if (this.previousOperand !== '') {
+                    this.compute();
+                }
+                this.operation = operation;
+                this.previousOperand = this.currentOperand;
+                this.currentOperand = '';
+            }
+
+            compute() {
+                let computation;
+                const prev = parseFloat(this.previousOperand);
+                const current = parseFloat(this.currentOperand);
+                
+                if (isNaN(prev) || isNaN(current)) return;
+
+                switch (this.operation) {
+                    case '+': computation = prev + current; break;
+                    case '-': computation = prev - current; break;
+                    case '×': computation = prev * current; break;
+                    case '÷':
+                        if (current === 0) {
+                            alert("Tidak bisa membagi dengan nol!");
+                            this.clear();
+                            return;
+                        }
+                        computation = prev / current;
+                        break;
+                    default: return;
+                }
+
+                this.addToHistory(prev, this.operation, current, computation);
+                this.currentOperand = computation;
+                this.operation = undefined;
+                this.previousOperand = '';
+                this.resetDisplay = true;
+            }
+
+            getDisplayNumber(number) {
+                const stringNumber = number.toString();
+                const integerDigits = parseFloat(stringNumber.split('.')[0]);
+                const decimalDigits = stringNumber.split('.')[1];
+                let integerDisplay;
+                
+                if (isNaN(integerDigits)) integerDisplay = '';
+                else integerDisplay = integerDigits.toLocaleString('id-ID', { maximumFractionDigits: 0 });
+
+                if (decimalDigits != null) return `${integerDisplay},${decimalDigits}`;
+                else return integerDisplay;
+            }
+
+            updateDisplay() {
+                this.currentOperandTextElement.innerText = this.getDisplayNumber(this.currentOperand);
+                if (this.operation != null) {
+                    this.previousOperandTextElement.innerText = `${this.getDisplayNumber(this.previousOperand)} ${this.operation}`;
+                } else {
+                    this.previousOperandTextElement.innerText = '';
+                }
+            }
+
+            addToHistory(prev, op, curr, result) {
+                const historyList = document.getElementById('historyList');
+                const emptyMsg = document.querySelector('.empty-history');
+                if (emptyMsg) emptyMsg.remove();
+
+                const li = document.createElement('li');
+                li.classList.add('history-item');
+                const prevStr = this.formatHistoryNumber(prev);
+                const currStr = this.formatHistoryNumber(curr);
+                const resStr = this.formatHistoryNumber(result);
+
+                li.innerHTML = `<span>${prevStr} ${op} ${currStr} =</span><span class="result">${resStr}</span>`;
+                historyList.insertBefore(li, historyList.firstChild);
+            }
+
+            formatHistoryNumber(num) {
+                let str = num.toString();
+                if (str.includes('.')) return parseFloat(num.toFixed(4)).toLocaleString('id-ID');
+                return num.toLocaleString('id-ID');
+            }
+        }
+
+        /* --- WEB AUDIO API --- */
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function playClickSound() {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            oscillator.type = 'sine';
+            oscillator.frequency.setValueAtTime(700, audioCtx.currentTime); 
+            gainNode.gain.setValueAtTime(0.05, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            oscillator.start();
+            oscillator.stop(audioCtx.currentTime + 0.1);
+        }
+
+        /* --- EVENT LISTENERS --- */
+        const numberButtons = document.querySelectorAll('[data-number]');
+        const operationButtons = document.querySelectorAll('[data-operation]');
+        const equalsButton = document.querySelector('[data-equals]');
+        const deleteButton = document.querySelector('[data-action="delete"]');
+        const allClearButton = document.querySelector('[data-action="clear"]');
+        const previousOperandTextElement = document.querySelector('[data-previous]');
+        const currentOperandTextElement = document.querySelector('[data-current]');
+
+        const calculator = new Calculator(previousOperandTextElement, currentOperandTextElement);
+
+        function handleInput(action) {
+            playClickSound();
+            action();
+            calculator.updateDisplay();
+        }
+
+        numberButtons.forEach(button => button.addEventListener('click', () => handleInput(() => calculator.appendNumber(button.innerText))));
+        operationButtons.forEach(button => button.addEventListener('click', () => handleInput(() => calculator.chooseOperation(button.innerText))));
+        equalsButton.addEventListener('click', () => handleInput(() => calculator.compute()));
+        allClearButton.addEventListener('click', () => handleInput(() => calculator.clear()));
+        deleteButton.addEventListener('click', () => handleInput(() => calculator.delete()));
+
+        /* --- KEYBOARD SUPPORT --- */
+        document.addEventListener('keydown', (e) => {
+            let key = e.key;
+            if (key >= '0' && key <= '9') { handleInput(() => calculator.appendNumber(key)); highlightButtonByText(key); }
+            else if (key === '.' || key === ',') { handleInput(() => calculator.appendNumber('.')); highlightButtonByText('.'); }
+            else if (key === '+' || key === '-') { handleInput(() => calculator.chooseOperation(key)); highlightButtonByText(key); }
+            else if (key === '*' || key === 'x') { handleInput(() => calculator.chooseOperation('×')); highlightButtonByText('×'); }
+            else if (key === '/') { e.preventDefault(); handleInput(() => calculator.chooseOperation('÷')); highlightButtonByText('÷'); }
+            else if (key === 'Enter' || key === '=') { e.preventDefault(); handleInput(() => calculator.compute()); highlightButtonBySelector('[data-equals]'); }
+            else if (key === 'Backspace') { handleInput(() => calculator.delete()); highlightButtonBySelector('[data-action="delete"]'); }
+            else if (key === 'Escape') { handleInput(() => calculator.clear()); highlightButtonBySelector('[data-action="clear"]'); }
+        });
+
+        function highlightButtonByText(text) {
+            const buttons = Array.from(document.querySelectorAll('button'));
+            const btn = buttons.find(b => b.innerText === text);
+            if (btn) triggerActiveState(btn);
+        }
+        function highlightButtonBySelector(selector) {
+            const btn = document.querySelector(selector);
+            if (btn) triggerActiveState(btn);
+        }
+        function triggerActiveState(element) {
+            element.style.transform = 'scale(0.92)';
+            element.style.filter = 'brightness(1.3)';
+            setTimeout(() => { element.style.transform = ''; element.style.filter = ''; }, 100);
+        }
+    </script>
+</body>
+</html>
