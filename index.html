@@ -7,26 +7,23 @@
     <style>
         /* --- CSS VARIABLES & RESET --- */
         :root {
-            /* Palet Warna Jerman (Modern & Soft) */
-            --bg-color: #121212;
-            --calc-bg: #1e1e1e;
-            
-            /* Warna Aksen */
+            /* Palet Warna Jerman */
             --german-red: #DD0000;
             --german-gold: #FFCE00;
             --german-black: #000000;
             
             /* Warna Tombol */
-            --btn-num-bg: #2d2d2d;
-            --btn-num-hover: #3d3d3d;
-            --btn-op-bg: #3a3a3a; 
+            --calc-bg: rgba(20, 20, 20, 0.85);
+            --btn-num-bg: rgba(255, 255, 255, 0.1);
+            --btn-num-hover: rgba(255, 255, 255, 0.2);
+            --btn-op-bg: rgba(0, 0, 0, 0.4);
             --btn-eq-bg: var(--german-red);
             --btn-del-bg: #555555;
             
             /* Ukuran & Bentuk */
-            --radius-outer: 25px;
-            --radius-btn: 50px; 
+            --radius-box: 12px;
             --shadow-soft: 0 10px 30px rgba(0, 0, 0, 0.5);
+            --calc-width: 300px; /* Ukuran Kalkulator */
         }
 
         * {
@@ -38,12 +35,13 @@
         }
 
         body {
-            background-color: var(--bg-color);
-            color: #ffffff; /* Global text color white */
+            /* Gradien Mewah dengan Tekanan Emas Elegan */
+            background: linear-gradient(145deg, #0d0d0d 0%, #4a3b00 30%, #2a0a0a 70%, #000000 100%);
+            color: #ffffff;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
+            justify-content: flex-start;
             min-height: 100vh;
             padding: 20px;
         }
@@ -51,39 +49,51 @@
         /* --- DECORATIVE HEADER --- */
         .app-header {
             text-align: center;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 2;
         }
 
         .app-header h1 {
-            font-size: 2rem;
-            font-weight: 700; /* Bold */
+            font-size: 1.8rem;
+            font-weight: 700;
             letter-spacing: 2px;
             margin-bottom: 5px;
-            color: #ffffff; /* Putih Saja */
+            color: #ffffff;
             text-transform: uppercase;
+            text-shadow: 0 0 10px rgba(255, 206, 0, 0.3);
         }
 
         .app-header p {
             color: #ffffff;
-            font-size: 0.95rem;
-            font-weight: 600; /* Bold */
-            opacity: 0.7;
+            font-size: 0.9rem;
+            font-weight: 600;
+            opacity: 0.8;
+        }
+
+        /* --- CONTAINER UTAMA --- */
+        .main-container {
+            display: flex;
+            flex-direction: row;
+            gap: 20px;
+            align-items: flex-start;
+            margin-bottom: 30px;
         }
 
         /* --- CALCULATOR BODY --- */
         .calculator {
             background-color: var(--calc-bg);
-            border-radius: var(--radius-outer);
+            border-radius: var(--radius-box);
             box-shadow: var(--shadow-soft);
-            width: 100%;
-            max-width: 360px;
-            padding: 25px;
-            border-top: 4px solid var(--german-gold); /* Aksen emas di atas */
+            width: var(--calc-width);
+            padding: 20px;
+            border-top: 4px solid var(--german-gold);
             position: relative;
             overflow: hidden;
+            flex-shrink: 0;
+            backdrop-filter: blur(15px);
         }
 
-        /* Dekorasi garis bendera halus di background */
         .calculator::before {
             content: '';
             position: absolute;
@@ -95,179 +105,206 @@
                 var(--german-black) 33%, 
                 var(--german-red) 33%, var(--german-red) 66%, 
                 var(--german-gold) 66%);
-            opacity: 0.8;
+            opacity: 0.9;
         }
 
         /* --- DISPLAY SCREEN --- */
         .screen {
-            background-color: #000;
-            border-radius: 15px;
-            padding: 20px;
+            background-color: rgba(0, 0, 0, 0.7);
+            border-radius: var(--radius-box);
+            padding: 15px;
             text-align: right;
-            margin-bottom: 25px;
-            box-shadow: inset 0 2px 5px rgba(0,0,0,0.5);
+            margin-bottom: 20px;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.8);
             display: flex;
             flex-direction: column;
             justify-content: flex-end;
-            height: 100px;
+            height: 90px;
         }
 
         .previous-operand {
-            color: #ffffff; /* Putih Saja (sebelumnya emas) */
-            font-size: 1.1rem;
-            min-height: 1.5rem;
+            color: #ffffff;
+            font-size: 0.9rem;
+            min-height: 1.2rem;
             margin-bottom: 5px;
-            font-weight: 600; /* Bold */
-            opacity: 0.6; /* Sedikit transparan agar terlihat secondary */
+            font-weight: 600;
+            opacity: 0.6;
         }
 
         .current-operand {
-            color: #ffffff; /* Putih Saja */
-            font-size: 2.8rem;
-            font-weight: 700; /* Extra Bold */
+            color: #ffffff;
+            font-size: 2.2rem;
+            font-weight: 700;
             word-wrap: break-word;
             word-break: break-all;
         }
 
-        /* --- KEYPAD --- */
+        /* --- KEYPAD (Full Layout, No Gaps) --- */
         .keypad {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 15px;
+            gap: 10px;
         }
 
         button {
-            height: 60px;
-            width: 60px;
-            border-radius: var(--radius-btn);
-            border: none;
-            font-size: 1.4rem;
-            font-weight: 700; /* Font tombol lebih bold */
+            height: 50px;
+            width: 100%;
+            border-radius: var(--radius-box);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            font-size: 1.2rem;
+            font-weight: 700;
             cursor: pointer;
-            transition: all 0.15s ease;
+            transition: all 0.1s ease;
             outline: none;
             user-select: none;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto;
-            color: #ffffff; /* Semua tombol putih */
+            color: #ffffff;
+            backdrop-filter: blur(5px);
         }
 
         button:active {
-            transform: scale(0.92);
+            transform: scale(0.96);
         }
 
-        /* Style Tombol Angka */
-        .btn-num {
-            background-color: var(--btn-num-bg);
-        }
-        .btn-num:hover {
-            background-color: var(--btn-num-hover);
-        }
+        .btn-num { background-color: var(--btn-num-bg); }
+        .btn-num:hover { background-color: var(--btn-num-hover); border-color: rgba(255, 255, 255, 0.2); }
 
-        /* Style Tombol Operator */
-        .btn-op {
-            background-color: var(--btn-op-bg);
-        }
-        .btn-op:hover {
-            background-color: #444;
-        }
+        .btn-op { background-color: var(--btn-op-bg); }
+        .btn-op:hover { background-color: rgba(255, 255, 255, 0.15); }
 
-        /* Style Tombol Sama Dengan (Merah) */
         .btn-eq {
             background-color: var(--german-red);
-            grid-column: span 1;
-            width: 100%;
-            border-radius: 30px; 
-            font-weight: 800; /* Paling bold */
+            grid-row: span 2; /* Memanjang 2 baris */
+            height: 100%;
+            border-radius: var(--radius-box);
+            font-weight: 800;
+            box-shadow: 0 4px 15px rgba(221, 0, 0, 0.4);
         }
-        .btn-eq:hover {
-            background-color: #ff1a1a;
+        .btn-eq:hover { background-color: #ff1a1a; }
+
+        .btn-del { background-color: var(--btn-del-bg); font-size: 1rem; }
+        .btn-del:hover { background-color: #666; }
+
+        /* Tombol 0 melebar 2 kolom agar tidak ada celah kosong */
+        button[data-number="0"] {
+            grid-column: span 2;
         }
 
-        /* Style Tombol Hapus (AC & DEL) */
-        .btn-del {
-            background-color: var(--btn-del-bg);
-            font-size: 1.1rem;
-        }
-        .btn-del:hover {
-            background-color: #666;
-        }
-
-        /* --- HISTORY SECTION --- */
+        /* --- HISTORY SECTION (Lebih Kecil) --- */
         .history-section {
-            margin-top: 30px;
-            width: 100%;
-            max-width: 360px;
-            text-align: left;
+            width: 240px; /* Lebih kecil dari kalkulator (300px) */
+            background-color: rgba(30, 30, 30, 0.5);
+            border-radius: var(--radius-box);
+            padding: 15px;
+            height: 420px; /* Lebih pendek dari kalkulator (470px) */
+            display: flex;
+            flex-direction: column;
+            box-shadow: var(--shadow-soft);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .history-title {
-            font-size: 0.95rem;
-            color: #ffffff; /* Judul putih */
+            font-size: 0.8rem;
+            color: var(--german-gold);
             margin-bottom: 10px;
             text-transform: uppercase;
             letter-spacing: 1px;
-            font-weight: 700; /* Bold */
-            border-bottom: 1px solid #333;
+            font-weight: 700;
+            border-bottom: 2px solid rgba(255, 206, 0, 0.5);
             padding-bottom: 5px;
         }
 
         .history-list {
             list-style: none;
-            max-height: 200px;
             overflow-y: auto;
+            flex-grow: 1;
             scrollbar-width: thin;
-            scrollbar-color: #555 #222;
+            scrollbar-color: var(--german-gold) rgba(0,0,0,0.2);
         }
         
-        .history-list::-webkit-scrollbar {
-            width: 6px;
-        }
-        .history-list::-webkit-scrollbar-thumb {
-            background-color: #555;
-            border-radius: 3px;
-        }
+        .history-list::-webkit-scrollbar { width: 4px; }
+        .history-list::-webkit-scrollbar-thumb { background-color: var(--german-gold); border-radius: 2px; }
 
         .history-item {
-            padding: 8px 0;
-            border-bottom: 1px solid #2a2a2a;
-            color: #ffffff; /* Riwayat Putih */
-            font-size: 0.9rem;
-            font-weight: 500; /* Medium bold */
+            padding: 6px 5px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            font-size: 0.75rem; /* Font lebih kecil */
+            font-weight: 500;
             display: flex;
-            justify-content: space-between;
+            flex-direction: column;
             animation: fadeIn 0.3s ease;
+            background-color: transparent;
         }
 
-        .history-item span.result {
-            color: #ffffff; /* Hasil Putih */
-            font-weight: 700; /* Bold */
-            margin-left: 10px;
-        }
+        .history-item span.expr { opacity: 0.7; margin-bottom: 2px; }
+        .history-item span.result { color: #ffffff; font-weight: 700; align-self: flex-end; text-shadow: 0 0 5px rgba(255, 206, 0, 0.4); }
 
         .empty-history {
-            color: #ffffff;
-            opacity: 0.4;
+            color: rgba(255, 255, 255, 0.5);
             font-style: italic;
-            font-size: 0.85rem;
+            font-size: 0.75rem;
             text-align: center;
-            padding: 10px 0;
+            margin-top: 40px;
             font-weight: 500;
+        }
+
+        /* --- FOOTER --- */
+        footer {
+            margin-top: auto;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+            text-align: left;
+            padding: 20px;
+            background: rgba(0,0,0,0.4);
+            border-radius: var(--radius-box);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            width: 100%;
+            max-width: 800px;
+            gap: 15px;
+            backdrop-filter: blur(10px);
+        }
+
+        .footer-logo {
+            width: 55px;
+            height: 55px;
+            object-fit: contain;
+            border-radius: 50%;
+            border: 1px solid var(--german-gold);
+            flex-shrink: 0;
+        }
+
+        .footer-text {
+            color: #ffffff;
+            font-size: 0.85rem;
+            font-weight: 600;
+            line-height: 1.4;
+            opacity: 0.9;
         }
 
         /* Animasi */
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-5px); }
-            to { opacity: 1; transform: translateY(0); }
+            from { opacity: 0; transform: translateX(10px); }
+            to { opacity: 1; transform: translateX(0); }
         }
 
         /* Responsif */
-        @media (max-width: 380px) {
-            .calculator { padding: 20px; }
-            button { height: 50px; width: 50px; font-size: 1.2rem; }
-            .current-operand { font-size: 2.2rem; }
+        @media (max-width: 768px) {
+            .main-container { flex-direction: column; align-items: center; }
+            .history-section { width: 100%; max-width: var(--calc-width); height: 200px; }
+            .calculator { max-width: var(--calc-width); }
+            button { height: 55px; }
+            
+            footer {
+                flex-direction: column;
+                text-align: center;
+            }
+            .footer-text { text-align: center; }
         }
     </style>
 </head>
@@ -278,53 +315,66 @@
         <p>Muhammad Rizky Nizam</p>
     </header>
 
-    <main class="calculator">
-        <!-- Layar Tampilan -->
-        <div class="screen">
-            <div class="previous-operand" data-previous></div>
-            <div class="current-operand" data-current>0</div>
-        </div>
+    <div class="main-container">
+        <!-- KALKULATOR -->
+        <main class="calculator">
+            <div class="screen">
+                <div class="previous-operand" data-previous></div>
+                <div class="current-operand" data-current>0</div>
+            </div>
 
-        <!-- Tombol Kalkulator -->
-        <div class="keypad">
-            <!-- Baris 1 -->
-            <button class="btn-del" data-action="clear">C</button>
-            <button class="btn-del" data-action="delete">⌫</button>
-            <button class="btn-op" data-operation>÷</button>
-            <button class="btn-op" data-operation>×</button>
+            <div class="keypad">
+                <!-- Baris 1 -->
+                <button class="btn-del" data-action="clear">C</button>
+                <button class="btn-del" data-action="delete">⌫</button>
+                <button class="btn-op" data-operation>÷</button>
+                <button class="btn-op" data-operation>×</button>
 
-            <!-- Baris 2 -->
-            <button class="btn-num" data-number>7</button>
-            <button class="btn-num" data-number>8</button>
-            <button class="btn-num" data-number>9</button>
-            <button class="btn-op" data-operation>-</button>
+                <!-- Baris 2 -->
+                <button class="btn-num" data-number>7</button>
+                <button class="btn-num" data-number>8</button>
+                <button class="btn-num" data-number>9</button>
+                <button class="btn-op" data-operation>-</button>
 
-            <!-- Baris 3 -->
-            <button class="btn-num" data-number>4</button>
-            <button class="btn-num" data-number>5</button>
-            <button class="btn-num" data-number>6</button>
-            <button class="btn-op" data-operation>+</button>
+                <!-- Baris 3 -->
+                <button class="btn-num" data-number>4</button>
+                <button class="btn-num" data-number>5</button>
+                <button class="btn-num" data-number>6</button>
+                <button class="btn-op" data-operation>+</button>
 
-            <!-- Baris 4 -->
-            <button class="btn-num" data-number>1</button>
-            <button class="btn-num" data-number>2</button>
-            <button class="btn-num" data-number>3</button>
-            <!-- Equals takes up one spot, but we span it vertically -->
-            <button class="btn-eq" style="grid-row: span 2; height: 100%; border-radius: 30px;" data-equals>=</button>
+                <!-- Baris 4 -->
+                <button class="btn-num" data-number>1</button>
+                <button class="btn-num" data-number>2</button>
+                <button class="btn-num" data-number>3</button>
+                <!-- Equals memanjang 2 baris -->
+                <button class="btn-eq" data-equals>=</button>
 
-            <!-- Baris 5 -->
-            <button class="btn-num" data-number>.</button>
-            <button class="btn-num" data-number>0</button>
-        </div>
-    </main>
+                <!-- Baris 5 -->
+                <!-- Tombol 0 span 2 kolom agar penuh -->
+                <button class="btn-num" data-number="0">0</button>
+                <button class="btn-num" data-number>.</button>
+                <!-- Samadengan sudah ada di atas (col 4) -->
+            </div>
+        </main>
 
-    <!-- Riwayat Perhitungan -->
-    <section class="history-section">
-        <div class="history-title">Riwayat</div>
-        <ul class="history-list" id="historyList">
-            <li class="empty-history">Belum ada perhitungan</li>
-        </ul>
-    </section>
+        <!-- RIWAYAT (Lebih Kecil) -->
+        <section class="history-section">
+            <div class="history-title">Riwayat</div>
+            <ul class="history-list" id="historyList">
+                <li class="empty-history">Belum ada perhitungan</li>
+            </ul>
+        </section>
+    </div>
+
+    <!-- FOOTER -->
+    <footer>
+        <img src="https://z-cdn-media.chatglm.cn/files/858e7d49-7675-429b-bdfc-f75831c883ed.png?auth_key=1869052090-c2aafed48808486eab275c3360aa1e5d-0-6989eafc82a44f127524938a638c8e4b" alt="Logo MAM 1" class="footer-logo">
+        <p class="footer-text">
+            MAM 1 Paciran<br>
+            Pondok Pesantren Karangasem Paciran Lamongan<br>
+            Tahun Pelajaran 2024-2026
+        </p>
+    </footer>
 
     <script>
         /**
@@ -442,7 +492,7 @@
                 const currStr = this.formatHistoryNumber(curr);
                 const resStr = this.formatHistoryNumber(result);
 
-                li.innerHTML = `<span>${prevStr} ${op} ${currStr} =</span><span class="result">${resStr}</span>`;
+                li.innerHTML = `<span class="expr">${prevStr} ${op} ${currStr} =</span><span class="result">${resStr}</span>`;
                 historyList.insertBefore(li, historyList.firstChild);
             }
 
@@ -515,8 +565,8 @@
             if (btn) triggerActiveState(btn);
         }
         function triggerActiveState(element) {
-            element.style.transform = 'scale(0.92)';
-            element.style.filter = 'brightness(1.3)';
+            element.style.transform = 'scale(0.96)';
+            element.style.filter = 'brightness(1.2)';
             setTimeout(() => { element.style.transform = ''; element.style.filter = ''; }, 100);
         }
     </script>
